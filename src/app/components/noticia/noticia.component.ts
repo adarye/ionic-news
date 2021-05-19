@@ -15,6 +15,8 @@ export class NoticiaComponent implements OnInit {
 
   @Input() item: Article;
   @Input() i: number;
+  @Input() enFavoritos;
+
   constructor(
     private actionSheetCtrl: ActionSheetController,
     private socialSharingCtrl: SocialSharing,
@@ -29,6 +31,25 @@ export class NoticiaComponent implements OnInit {
   }
 
   async lanzarMenu() {
+
+    let borrarBnt;
+    if (this.enFavoritos) {
+      borrarBnt = {
+        text: 'Borrar favorito',
+        icon: 'trash',
+        handler: () => {
+          this.localstorageService.borrarNoticia(this.item)
+        }
+      }
+    } else {
+      borrarBnt = {
+        text: 'Favorito',
+        icon: 'heart',
+        handler: () => {
+          this.localstorageService.guardarNoticia(this.item)
+        }
+      }
+    }
     const actionSheet = await this.actionSheetCtrl.create({
       cssClass: 'my-custom-class',
       buttons: [{
@@ -38,13 +59,8 @@ export class NoticiaComponent implements OnInit {
           this.socialSharingCtrl.share(this.item.title, this.item.source.name, '', this.item.url)
         }
       },
+      borrarBnt,
       {
-        text: 'Favorito',
-        icon: 'heart',
-        handler: () => {
-          this.localstorageService.guardarNoticia(this.item)
-        }
-      }, {
         text: 'Cancel',
         icon: 'close',
         role: 'cancel',
